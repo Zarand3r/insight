@@ -1,3 +1,10 @@
+Image taking a picture of your notes, or the whiteboard during lecture on your phone, and having it fed into an algorithm that converts the handwritten digits into text?
+
+Make it a web app first
+
+
+
+
 Converts a picture of text into digital text.
 Uses a pretrained model from machine learning.
 This is just for practice.
