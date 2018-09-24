@@ -87,7 +87,7 @@ ax = fig.add_subplot(1, 1, 1, title='TSNE' )
 ax.scatter(
     x=df_tsne['x-tsne'], 
     y=df_tsne['y-tsne'], 
-    c=y, 
+    c=df_tsne['label'], 
     cmap=plt.cm.get_cmap('Paired'), 
     alpha=0.15)
 plt.show()

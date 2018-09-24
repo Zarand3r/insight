@@ -75,7 +75,7 @@ def cnn_model_fn(features, labels, mode):
 
 def main(unused_argv):
 	old_pwd = os.getcwd()
-  	os.chdir("../models")
+	os.chdir("../models")
 	# Load training and eval data
 	mnist = tf.contrib.learn.datasets.load_dataset("mnist") #Do for EMNIST dataset too
 	os.chdir(old_pwd)

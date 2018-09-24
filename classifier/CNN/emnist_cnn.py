@@ -42,14 +42,14 @@ def cnn_model_fn(features, labels, mode):
 	  inputs=dense, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
 
 	# Logits Layer
-	logits = tf.layers.dense(inputs=dropout, units=10)
+	logits = tf.layers.dense(inputs=dropout, units=27) # 27 classes labeled 1 - 27
 
 	predictions = {
-	# Generate predictions (for PREDICT and EVAL mode)
-	"classes": tf.argmax(input=logits, axis=1),
-	# Add `softmax_tensor` to the graph. It is used for PREDICT and by the
-	# `logging_hook`.
-	"probabilities": tf.nn.softmax(logits, name="softmax_tensor")
+		# Generate predictions (for PREDICT and EVAL mode)
+		"classes": tf.argmax(input=logits, axis=1),
+		# Add `softmax_tensor` to the graph. It is used for PREDICT and by the
+		# `logging_hook`.
+		"probabilities": tf.nn.softmax(logits, name="softmax_tensor")
 	}
 
 	if mode == tf.estimator.ModeKeys.PREDICT:
@@ -78,7 +78,7 @@ def main(unused_argv):
 	old_pwd = os.getcwd()
 	os.chdir("../models")
 	# Load training and eval data
-	emnist = spio.loadmat("../imagedata/emnist-digits.mat") #Do for Eemnist dataset too
+	emnist = spio.loadmat("../TrainingData/emnist-digits.mat") #Do for Eemnist dataset too
 	os.chdir(old_pwd)
 
 	train_data = emnist["dataset"][0][0][0][0][0][0]

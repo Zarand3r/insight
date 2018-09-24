@@ -145,7 +145,7 @@ def identify(image, modelDir = "classifier/models", model = "inception_v3_2016_0
 
 if __name__ == "__main__":
 
-  file_name = "imagedata/grace_hopper.jpg"
+  file_name = "input/grace_hopper.jpg"
   model = "inception_v3_2016_08_28"
 
   parser = argparse.ArgumentParser()

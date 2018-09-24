@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     # freeze_graph(args.model_dir, args.output_node_names)
 
-    freeze_graph('../models/mnist_model', 'softmax_tensor')
+    freeze_graph('../models/emnist_model', 'softmax_tensor')
 
 
 
