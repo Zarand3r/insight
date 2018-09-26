@@ -10,6 +10,13 @@ import scipy
 
 import emnist_cnn as clf
 
+def load_labels(label_file):
+  labels = []
+  proto_as_ascii_lines = tf.gfile.GFile(label_file).readlines()
+  for l in proto_as_ascii_lines:
+    labels.append(l.rstrip())
+  return labels
+
 def main(image_path, output_directory):
 	image = cv2.imread(image_path)
 
@@ -49,7 +56,9 @@ def main(image_path, output_directory):
 				left=bordersize, 
 				right=bordersize, 
 				borderType= cv2.BORDER_CONSTANT, 
-				value=[mean,mean,mean] )
+				# value=[mean,mean,mean] )
+				value=[0,0,0] )
+
 
 			cv2.imwrite(output_directory + str(index) + ".png", border)
 
@@ -103,6 +112,7 @@ def convert_handwritten_image_to_emnist_format(output_directory):
 
 
 def classify(data):
+	labels = load_labels('../models/emnist_model/labels.txt')
 	with tf.Session() as sess:
 		checkpoint = tf.train.latest_checkpoint('../models/emnist_model/')
 		saver = tf.train.import_meta_graph("../models/emnist_model/model.ckpt-20000.meta")
@@ -125,7 +135,9 @@ def classify(data):
 			shuffle=False)
 
 		pred_results = emnist_classifier.predict(input_fn=pred_input_fn)
-		print(list(pred_results))
+		predictions = list(pred_results)
+		for i in range(0, len(predictions)):
+			print(labels[predictions[i]['classes']-1])
 
 
 
@@ -134,4 +146,5 @@ def classify(data):
 if __name__ == "__main__":
 	tf.reset_default_graph()
 	tf.logging.set_verbosity(tf.logging.INFO)
-	main('../input/helloworld.png', '../output/letters')
+	# main('../input/helloworld.png', '../output/letters/')
+	main('../input/handwriting.png', '../output/test/')

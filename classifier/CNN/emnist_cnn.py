@@ -78,7 +78,8 @@ def main(unused_argv):
 	old_pwd = os.getcwd()
 	os.chdir("../models")
 	# Load training and eval data
-	emnist = spio.loadmat("../TrainingData/emnist-digits.mat") #Do for Eemnist dataset too
+	# emnist = spio.loadmat("../TrainingData/emnist-digits.mat") #Do for Eemnist dataset too
+	emnist = spio.loadmat("../TrainingData/emnist-letters.mat") 
 	os.chdir(old_pwd)
 
 	train_data = emnist["dataset"][0][0][0][0][0][0]

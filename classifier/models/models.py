@@ -34,6 +34,17 @@ data["emnist_model"] = {
     "output_node": "softmax_tensor"
 }  
 
+data["emnist_cnn_model"] = {
+    "input_height": 28,
+    "input_width": 28,
+    "script": "emnist_classifier",
+    "model_file": "emnist_cnn_model/frozen_model.pb",
+    "checkpoint_file": "emnist_cnn_model/model.ckpt-12000.meta",
+    "label_file": "emnist_cnn_model/labels.txt",
+    "input_node": "Reshape",
+    "output_node": "softmax_tensor"
+}  
+
 
 
 # mobilenet_v1_1.0_224

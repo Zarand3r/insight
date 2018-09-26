@@ -119,6 +119,7 @@ def predict_from_checkpoint(image_path, model):
     # labels = load_labels(model_data[model]['label_file'])
     input_height = model_data[model]['input_height']
     input_width = model_data[model]['input_width']
+    labels = load_labels(path_to_models+model_data[model]['label_file'])
     image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width, channels = 1)
 
     import importlib
@@ -144,15 +145,30 @@ def predict_from_checkpoint(image_path, model):
         shuffle=False)
 
       pred_results = emnist_classifier.predict(input_fn=pred_input_fn)
-      print(list(pred_results))
+      # print(list(pred_results))
+      print(labels[(list(pred_results))[0]['classes']-1])
+
 
 if __name__ == '__main__':
   # image_path = "../input/test_number.png"
   # predict_from_frozen(image_path, "mnist_model")
+  # predict_from_checkpoint(image_path, "mnist_model")
 
-  image_path = "../input/test_letter.png"
+  # image_path = "../input/test_letter.png"
+  # predict_from_checkpoint(image_path, "emnist_cnn_model")
+  # predict_from_frozen(image_path, "emnist_model")
+
+  # image_path = "../input/test_letter3.png"
+  # predict_from_checkpoint(image_path, "emnist_cnn_model")
+  # predict_from_frozen(image_path, "emnist_cnn_model")
+
+  # image_path = "../input/test_number4.png"
+  # predict_from_checkpoint(image_path, "mnist_model")
+
+  image_path = "../input/test5.png"
   predict_from_checkpoint(image_path, "emnist_model")
 
+#need to preprocess images to convert to nist format (black background, white letters/numbers)
 
 
     
