@@ -37,11 +37,16 @@ def read_tensor_from_image_file(file_name,
   float_caster = tf.cast(image_reader, tf.float32)
   dims_expander = tf.expand_dims(float_caster, 0)
   resized = tf.image.resize_bilinear(dims_expander, [input_height, input_width])
-  normalized = tf.divide(tf.subtract(resized, [input_mean]), [input_std])
+  normalized = tf.image.rgb_to_grayscale(resized)
+  normalized = tf.divide(tf.subtract(normalized, [input_mean]), [input_std])
   sess = tf.Session()
   result = sess.run(normalized)
-
   return result
+
+  # normalized = tf.image.rgb_to_grayscale(resized)
+  # sess = tf.Session()
+  # result = sess.run(normalized)
+  # return result
 
 def load_graph(frozen_graph_filename):
     # We load the protobuf file from the disk and parse it to retrieve the 
@@ -93,7 +98,7 @@ def predict_from_frozen(image_path, model):
     y = output_operation.outputs[0]
 
     # input parameters are to reshape the image array into a tensor with the right dimensions to feed into neural network
-    image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width, channels = 1)
+    image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width)
     # print(image)
         
     # We launch a Session
@@ -120,7 +125,7 @@ def predict_from_checkpoint(image_path, model):
     input_height = model_data[model]['input_height']
     input_width = model_data[model]['input_width']
     labels = load_labels(path_to_models+model_data[model]['label_file'])
-    image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width, channels = 1)
+    image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width)
 
     import importlib
     clf = importlib.import_module(module)
@@ -145,8 +150,8 @@ def predict_from_checkpoint(image_path, model):
         shuffle=False)
 
       pred_results = emnist_classifier.predict(input_fn=pred_input_fn)
-      # print(list(pred_results))
-      print(labels[(list(pred_results))[0]['classes']-1])
+      print(list(pred_results))
+      # print(labels[(list(pred_results))[0]['classes']-1])
 
 
 if __name__ == '__main__':
@@ -165,7 +170,8 @@ if __name__ == '__main__':
   # image_path = "../input/test_number4.png"
   # predict_from_checkpoint(image_path, "mnist_model")
 
-  image_path = "../input/test5.png"
+  # image_path = "../output/test/7.png"
+  image_path = "../input/test_number4.png"
   predict_from_checkpoint(image_path, "emnist_model")
 
 #need to preprocess images to convert to nist format (black background, white letters/numbers)

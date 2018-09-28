@@ -82,7 +82,8 @@ def main(image_path, output_directory):
 	classify(convert_handwritten_image_to_emnist_format(output_directory))
 
 
-		
+
+## USE OPENCV Thresholding GENERATE BINARY MASK
 def convert_handwritten_image_to_emnist_format(output_directory):
 	handwritten_dataset = os.listdir(output_directory)
 	num_images = len(handwritten_dataset)
