@@ -8,7 +8,7 @@ import string
 import tensorflow as tf
 import scipy
 
-import emnist_cnn as clf
+import mnist_cnn as clf
 
 def load_labels(label_file):
   labels = []
@@ -79,12 +79,12 @@ def main(image_path, output_directory):
 		#cv2.waitKey(0)
 		api.End()
 
-	classify(convert_handwritten_image_to_emnist_format(output_directory))
+	classify(convert_handwritten_image_to_mnist_format(output_directory))
 
 
 
 ## USE OPENCV Thresholding GENERATE BINARY MASK
-def convert_handwritten_image_to_emnist_format(output_directory):
+def convert_handwritten_image_to_mnist_format(output_directory):
 	handwritten_dataset = os.listdir(output_directory)
 	num_images = len(handwritten_dataset)
 
@@ -109,33 +109,34 @@ def convert_handwritten_image_to_emnist_format(output_directory):
 			#print(vector.shape)
 			index+=1
 
+	data = data.reshape(data.shape[0], 28, 28, 1)
+	data = np.asarray(data, dtype=np.float32)
 	return data
 
 
 def classify(data):
-	labels = load_labels('../models/emnist_model/labels.txt')
+	labels = load_labels('../models/mnist_model/labels.txt')
 	with tf.Session() as sess:
-		checkpoint = tf.train.latest_checkpoint('../models/emnist_model/')
-		saver = tf.train.import_meta_graph("../models/emnist_model/model.ckpt-20000.meta")
-		saver.restore(sess, tf.train.latest_checkpoint('../models/emnist_model/'))
+		checkpoint = tf.train.latest_checkpoint('../models/mnist_model/')
+		saver = tf.train.import_meta_graph("../models/mnist_model/model.ckpt-20000.meta")
+		saver.restore(sess, tf.train.latest_checkpoint('../models/mnist_model/'))
 
-		data = data.reshape(data.shape[0], 28, 28, 1)
-		pred_data = np.asarray(data, dtype=np.float32)
+		pred_data = data
 		#img = tf.placeholder(shape=[len(data), 28, 28, 1], dtype=tf.float32)
 		#data = tf.convert_to_tensor(images, dtype=tf.float32)
 		#feed_dict = {"x": pred_data}
 		print("model restored")
 
-		emnist_classifier = tf.estimator.Estimator(
+		mnist_classifier = tf.estimator.Estimator(
 			model_fn=clf.cnn_model_fn,
-			model_dir="../models/emnist_model")
+			model_dir="../models/mnist_model")
 
 		pred_input_fn = tf.estimator.inputs.numpy_input_fn(
 			x={"x": pred_data},
 			num_epochs=1,
 			shuffle=False)
 
-		pred_results = emnist_classifier.predict(input_fn=pred_input_fn)
+		pred_results = mnist_classifier.predict(input_fn=pred_input_fn)
 		predictions = list(pred_results)
 		for i in range(0, len(predictions)):
 			print(labels[predictions[i]['classes']-1])

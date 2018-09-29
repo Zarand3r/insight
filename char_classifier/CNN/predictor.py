@@ -37,7 +37,7 @@ def read_tensor_from_image_file(file_name,
   float_caster = tf.cast(image_reader, tf.float32)
   dims_expander = tf.expand_dims(float_caster, 0)
   resized = tf.image.resize_bilinear(dims_expander, [input_height, input_width])
-  normalized = tf.image.rgb_to_grayscale(resized)
+  # normalized = tf.image.rgb_to_grayscale(resized)
   normalized = tf.divide(tf.subtract(normalized, [input_mean]), [input_std])
   sess = tf.Session()
   result = sess.run(normalized)
@@ -47,6 +47,21 @@ def read_tensor_from_image_file(file_name,
   # sess = tf.Session()
   # result = sess.run(normalized)
   # return result
+
+def convert(image_path):
+  import cv2
+  #preprocessing: 
+  #figure out how to resize image to 28X28 first
+  #then figure out how to make black background and white foreground (opencv thresholding?)
+  data = np.zeros((1, 784)) # 28x28 = 784
+  img = Image.open(image_path)
+  arr = np.array(img)
+  arr = cv2.cvtColor(arr, cv2.COLOR_RGB2GRAY)
+  flat_arr = arr.ravel()
+  data[0, :] = flat_arr
+  data = data.reshape(data.shape[0], 28, 28, 1)
+  data = np.asarray(data, dtype=np.float32)
+  return data
 
 def load_graph(frozen_graph_filename):
     # We load the protobuf file from the disk and parse it to retrieve the 
@@ -64,7 +79,7 @@ def load_graph(frozen_graph_filename):
     return graph
 
 
-def predict_from_frozen(image_path, model):
+def predict_from_frozen(image_path, model, nist = True):
     path_to_models = "../models/"
     with open(path_to_models + 'models.json') as json_data:
       model_data = json.load(json_data)
@@ -98,7 +113,7 @@ def predict_from_frozen(image_path, model):
     y = output_operation.outputs[0]
 
     # input parameters are to reshape the image array into a tensor with the right dimensions to feed into neural network
-    image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width)
+    image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width, channels = 1)
     # print(image)
         
     # We launch a Session
@@ -115,7 +130,7 @@ def predict_from_frozen(image_path, model):
 
 
 
-def predict_from_checkpoint(image_path, model):
+def predict_from_checkpoint(image_path, model, nist = True):
     path_to_models = "../models/"
     with open(path_to_models + 'models.json') as json_data:
       model_data = json.load(json_data)
@@ -125,7 +140,11 @@ def predict_from_checkpoint(image_path, model):
     input_height = model_data[model]['input_height']
     input_width = model_data[model]['input_width']
     labels = load_labels(path_to_models+model_data[model]['label_file'])
-    image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width)
+
+    if (nist):
+      image = convert(image_path)
+    else:
+      image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width, channels = 1)
 
     import importlib
     clf = importlib.import_module(module)
@@ -155,26 +174,11 @@ def predict_from_checkpoint(image_path, model):
 
 
 if __name__ == '__main__':
-  # image_path = "../input/test_number.png"
-  # predict_from_frozen(image_path, "mnist_model")
-  # predict_from_checkpoint(image_path, "mnist_model")
-
-  # image_path = "../input/test_letter.png"
-  # predict_from_checkpoint(image_path, "emnist_cnn_model")
-  # predict_from_frozen(image_path, "emnist_model")
-
-  # image_path = "../input/test_letter3.png"
-  # predict_from_checkpoint(image_path, "emnist_cnn_model")
-  # predict_from_frozen(image_path, "emnist_cnn_model")
-
-  # image_path = "../input/test_number4.png"
-  # predict_from_checkpoint(image_path, "mnist_model")
 
   # image_path = "../output/test/7.png"
-  image_path = "../input/test_number4.png"
+  image_path = "../output/test/4.png"
   predict_from_checkpoint(image_path, "emnist_model")
 
-#need to preprocess images to convert to nist format (black background, white letters/numbers)
 
 
     
