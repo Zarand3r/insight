@@ -18,7 +18,9 @@ def read_tensor_from_image_file(file_name,
                                 input_width=28,
                                 input_mean=0,
                                 input_std=255,
-                                channels=3):
+                                channels=3,
+                                nist = True):
+  #This is assuming input images have been preprocessed to the necessary format dimensions and coloring
   input_name = "file_reader"
   output_name = "normalized"
 
@@ -37,10 +39,13 @@ def read_tensor_from_image_file(file_name,
   float_caster = tf.cast(image_reader, tf.float32)
   dims_expander = tf.expand_dims(float_caster, 0)
   resized = tf.image.resize_bilinear(dims_expander, [input_height, input_width])
-  # normalized = tf.image.rgb_to_grayscale(resized)
-  normalized = tf.divide(tf.subtract(normalized, [input_mean]), [input_std])
-  sess = tf.Session()
-  result = sess.run(normalized)
+  if (nist):
+    sess = tf.Session()
+    result = sess.run(resized)
+  else:
+    normalized = tf.divide(tf.subtract(resized, [input_mean]), [input_std])
+    sess = tf.Session()
+    result = sess.run(normalized)
   return result
 
   # normalized = tf.image.rgb_to_grayscale(resized)
@@ -48,20 +53,20 @@ def read_tensor_from_image_file(file_name,
   # result = sess.run(normalized)
   # return result
 
-def convert(image_path):
-  import cv2
-  #preprocessing: 
-  #figure out how to resize image to 28X28 first
-  #then figure out how to make black background and white foreground (opencv thresholding?)
-  data = np.zeros((1, 784)) # 28x28 = 784
-  img = Image.open(image_path)
-  arr = np.array(img)
-  arr = cv2.cvtColor(arr, cv2.COLOR_RGB2GRAY)
-  flat_arr = arr.ravel()
-  data[0, :] = flat_arr
-  data = data.reshape(data.shape[0], 28, 28, 1)
-  data = np.asarray(data, dtype=np.float32)
-  return data
+# def convert(image_path):
+#   import cv2
+#   #preprocessing: 
+#   #figure out how to resize image to 28X28 first
+#   #then figure out how to make black background and white foreground (opencv thresholding?)
+#   data = np.zeros((1, 784)) # 28x28 = 784
+#   img = Image.open(image_path)
+#   arr = np.array(img)
+#   arr = cv2.cvtColor(arr, cv2.COLOR_RGB2GRAY)
+#   flat_arr = arr.ravel()
+#   data[0, :] = flat_arr
+#   data = data.reshape(data.shape[0], 28, 28, 1)
+#   data = np.asarray(data, dtype=np.float32)
+#   return data
 
 def load_graph(frozen_graph_filename):
     # We load the protobuf file from the disk and parse it to retrieve the 
@@ -112,9 +117,7 @@ def predict_from_frozen(image_path, model, nist = True):
     x = input_operation.outputs[0]
     y = output_operation.outputs[0]
 
-    # input parameters are to reshape the image array into a tensor with the right dimensions to feed into neural network
-    image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width, channels = 1)
-    # print(image)
+    image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width, channels = 1, nist = nist)
         
     # We launch a Session
     with tf.Session(graph=graph) as sess:
@@ -141,10 +144,8 @@ def predict_from_checkpoint(image_path, model, nist = True):
     input_width = model_data[model]['input_width']
     labels = load_labels(path_to_models+model_data[model]['label_file'])
 
-    if (nist):
-      image = convert(image_path)
-    else:
-      image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width, channels = 1)
+    image = read_tensor_from_image_file(image_path, input_height = input_height, input_width = input_width, channels = 1, nist = nist)
+
 
     import importlib
     clf = importlib.import_module(module)
@@ -177,7 +178,8 @@ if __name__ == '__main__':
 
   # image_path = "../output/test/7.png"
   image_path = "../output/test/4.png"
-  predict_from_checkpoint(image_path, "emnist_model")
+  # predict_from_checkpoint(image_path, "mnist_model", nist = False)
+  predict_from_checkpoint(image_path, "emnist_model", nist = True)
 
 
 
