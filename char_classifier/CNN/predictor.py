@@ -126,9 +126,7 @@ def predict_from_frozen(image_path, model, nist = True):
         prediction = sess.run(y, feed_dict={
             x: image
         })
-        # I taught a neural net to recognise when a sum of numbers is bigger than 45
-        # it should return False in this case
-        print(prediction) # [[ False ]] Yay, it works!
+        print(prediction) 
 
 
 
