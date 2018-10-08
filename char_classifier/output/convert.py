@@ -1,0 +1,1 @@
+#converts images to the nist format (black background, white letter)
